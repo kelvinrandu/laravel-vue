@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->bigIncrements('id');
             $table->string('order_number');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

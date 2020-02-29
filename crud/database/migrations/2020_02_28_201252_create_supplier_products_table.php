@@ -18,6 +18,7 @@ class CreateSupplierProductsTable extends Migration
             $table->integer('supply_id');
             $table->integer('product_id');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
