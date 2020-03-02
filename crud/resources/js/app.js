@@ -23,7 +23,11 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component('products', require('./components/Products.vue').default);
+Vue.component('orders', require('./components/Orders.vue').default);
+Vue.component('suppliers', require('./components/Suppliers.vue').default);
+Vue.component('login', require('./components/Login.vue').default);
+Vue.component('register', require('./components/Register.vue').default);
 Vue.component(
     'passport-clients',
     require('./components/passport/Clients.vue').default
