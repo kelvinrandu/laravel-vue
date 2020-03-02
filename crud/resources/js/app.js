@@ -6,7 +6,11 @@
 
 require('./bootstrap');
 
+
 window.Vue = require('vue');
+
+
+
 
 /**
  * The following block of code may be used to automatically register your
@@ -43,4 +47,20 @@ Vue.component(
 
 const app = new Vue({
     el: '#app',
+    data:{
+        newItem: {'password': '', 'email': ''},
+        hasError: true,
+    },
+    methods:{
+       login: function login () {
+            var input = this.newItem;
+            axios.post('/api/login', input).then(function (response){
+
+                return response.data;
+              
+
+            });
+
+        }
+    }
 });

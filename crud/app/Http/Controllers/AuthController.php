@@ -5,49 +5,63 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\User;
+use Auth;
 
 class AuthController extends Controller
 {
 
     public function login(Request $request)
     {
-        $http = new \GuzzleHttp\Client;
+        // validate user input
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+        ]);
+  
+        //on unsuccesful login attempt
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            return response()->json(['message' => 'Unauthorized'], 500);
 
-        try {
-            $response = $http->post('http://127.0.0.1:8000/oauth/token', [
-                'form_params' => [
-                    'grant_type' => 'password',
-                    'client_id' => 4,
-                    'client_secret' => '963f1FKPYPLjztsrDHG8oW4MWMBS5e7Lt8RS3fLj',
-                    'username' => $request->username,
-                    'password' => $request->password,
-                ]
-            ]);
-            return $response->getBody();
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            if ($e->getCode() === 400) {
-                return response()->json('Invalid Request. Please enter a username or a password.', $e->getCode());
-            } else if ($e->getCode() === 401) {
-                return response()->json('Your credentials are incorrect. Please try again', $e->getCode());
-            }
-
-            return response()->json('Something went wrong on the server.', $e->getCode());
         }
+
+         //
+        $user = $request->user();
+        $token_data = $user->createToken('My Token');
+        $token = $token_data->token;
+        
+        if ($token->save()) {
+            return response()->json([
+                'user' => $user ,
+                'access_token' => $token_data->accessToken], 200);
+        } else {
+            return response()->json([
+                'message' => 'error occured during login, please try again'
+            ], 500);
+        }
+
+
     }
 
 
     public function register(Request $request)
     {
+        // validate user input
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
         ]);
 
-        return User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        if (!$user){
+            return response()->json(['success'=> false,'message' => 'Registration failed'], 500);
+        }
+
+        return response()->json(['success'=> true,'message' => 'Registration was succesful'], 200);
     }
 }
